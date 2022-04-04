@@ -1,4 +1,5 @@
 ﻿#include <iostream>
+#include <vector>
 
 int main()
 {
@@ -17,6 +18,7 @@ int main()
 		j = 1, // point position on axis x(j)
 		N = 10; // end of axis x(j)
 
+	std::vector<float> vect;
 
 	while (n <= M)
 	{
@@ -24,11 +26,18 @@ int main()
 		{
 			Unplus1j = Unj + (deltaT / pow(deltaX, 2)) * (Unj + deltaX - 2 * Unj + Unj - deltaX) + pow(deltaT * ((j - 1) * deltaX), 2);
 			Unj = Unplus1j;
+			vect.push_back(Unj);
 		}
 		Ulbc = pow(n * deltaT, 2);
 		Urbc = n * deltaT + 1;
 		n++;
 	}
 
-	std::cout << Unj;
+	for (int i = 0; i < vect.size(); i++)
+	{
+		std::cout << vect[i] << " ";
+	}
+	
+
+	std::cout << "\n" << Unj;
 }
