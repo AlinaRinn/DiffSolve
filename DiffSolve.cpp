@@ -1,43 +1,144 @@
 ﻿#include <iostream>
-#include <vector>
+#include <fstream>
+#include <iomanip>
 
-int main()
+void ExplicitScheme(double deltaT, double deltaX, int Nx, int Nt, double **U)
 {
-	float deltaT = 0.1, // t-step
-		  deltaX = 0.1, // x-step (h)
-	   	  x = 0,        // variable 1 (temperature)
-		  t = 0,        // variable 2 (time)
-		  Unj = 0,      // initial condition
-		  Unplus1j = 0, // function U in point with accordance t(n), x(j)
-		  Ulbc = 0,     // left boundary condition
-		  Urbc = 0;     // right boundary condition
-
-	int n = 0, // point position on axis t(n)
-		M = 10, // end of axis t(n)
-
-		j = 1, // point position on axis x(j)
-		N = 10; // end of axis x(j)
-
-	std::vector<float> vect;
-
-	while (n <= M)
+	if ((deltaT / deltaX) <= 0.5) 
 	{
-		for (j = 2; j < N - 1; j++)
+		std::cout << "Условная устойчивость\n\n";
+	}
+	else 
+	{
+		std::cout << "Условие устойчивости не выполнено\n\n";
+	}
+
+	//for (int i = 0; i < Nx; i++)
+	//{
+	//	for (int k = 0; k < Nt; k++)
+	//	{
+	//		U[i][k] = 0;
+	//	}
+	//}
+
+	//int n = 1;
+
+	//while (n <= Nx)
+	//{
+	//	U[n][1] = pow(n * deltaT, 2);
+	//	U[n][Nt] = n * deltaT + pow(n * deltaT, 2);
+	//	for (int j = 2; j < Nt; j++)
+	//	{
+	//		U[n][j] = U[n-1][j] + (deltaT / pow(deltaX, 2)) * (U[n][j] - 2 * U[n][j-1] + U[n][j-2]) + pow(deltaT * ((j - 1) * deltaX), 2);
+	//	}
+	//	n++;
+	//}
+
+	int n = 0;
+
+	while (n < Nt)
+	{
+		for (int j = 2; j < Nx - 1; j++)
 		{
-			Unplus1j = Unj + (deltaT / pow(deltaX, 2)) * (Unj + deltaX - 2 * Unj + Unj - deltaX) + pow(deltaT * ((j - 1) * deltaX), 2);
-			Unj = Unplus1j;
-			vect.push_back(Unj);
+			U[j][n+1] = U[j][n] + (deltaT / pow(deltaX, 2)) * (U[j+1][n] - 2 * U[j][n] + U[j-1][n]) + pow(deltaT * ((j - 1) * deltaX), 2);
 		}
-		Ulbc = pow(n * deltaT, 2);
-		Urbc = n * deltaT + 1;
+		U[1][n+1] = pow(n * deltaT, 2);
+		U[Nx-1][n+1] = n * deltaT + pow(n * deltaT, 2);
 		n++;
 	}
 
-	for (int i = 0; i < vect.size(); i++)
+	std::ofstream out("solve.txt");
+	for (int i = 0; i < Nx; i++)
 	{
-		std::cout << vect[i] << " ";
+		for (int k = 0; k < Nt; k++)
+		{
+			printf("%6.4lf ", U[i][k]);
+			out << U[i][k] << " ";
+			//std::cout.precision(5);
+			//std::cout << std::left << std::setw(10) << U[i][k] << " ";
+		}
+		std::cout << "\n----------------------------------------------------------------------------------------------\n";
+		out << "\n---------------------------------------------------------------------------------------------------------------------------------------------\n";
 	}
-	
+	out.close();
+}
 
-	std::cout << "\n" << Unj;
+void ImplicitScheme(double deltaT, double deltaX, int Nx, int Nt, double **U) {
+	for (int n = 0; n < Nx; n++)
+	{
+		for (int j = 0; j < Nt; j++)
+		{
+			U[n][j] = 0;
+		}
+	}
+
+	int n = 0;
+	double *alfa = new double[Nx],
+		   *beta = new double[Nx], //pow(n, 2) * pow(deltaT, 2),
+		   *a = new double[Nx],
+		   *b = new double[Nx],
+		   *c = new double[Nx],
+		   **e = new double*[Nx];
+	for (int i = 0; i < Nx; i++) {
+			e[i] = new double[Nt];
+	}
+
+	alfa[1] = 0; 
+	beta[1] = pow(n, 2) * pow(deltaT, 2);
+
+	while (n <= Nt)
+	{
+		for (int j = 2; j < Nx; j++)
+		{
+			a[j] = -1*deltaT / pow(deltaX, 2);
+			b[j] = 1 + 2 * (deltaT / pow(deltaX, 2));
+			c[j] = -1*deltaT / pow(deltaX, 2);
+			e[j][n] = U[j][n] + (deltaT * pow((j - 1) * deltaX, 2));
+
+			alfa[j] = (- 1 * a[j]) / (b[j] + c[j] * alfa[j - 1]);
+			beta[j] = (e[j][n] - c[j] * beta[j - 1]) / (b[j] + c[j] * alfa[j - 1]);
+		}
+		U[Nx][n + 1] = n * deltaT + pow(n, 2) * pow(deltaT, 2);
+
+		for (int j = Nx-1; j > 1; j--)
+		{
+			U[j][n + 1] = alfa[j] * U[j + 1][n + 1] + beta[j];
+		}
+		n++;
+	}
+
+	std::ofstream out("solve.txt", std::ios::app);
+	out << "\n\n\n\n\n";
+	for (int i = 0; i < Nx; i++)
+	{
+		for (int k = 0; k < Nt; k++)
+		{
+			printf("%6.4lf ", U[i][k]);
+			out << U[i][k] << " ";
+			//std::cout.precision(5);
+			//std::cout << std::left << std::setw(10) << U[i][k] << " ";
+		}
+		std::cout << "\n----------------------------------------------------------------------------------------------\n";
+		out << "\n---------------------------------------------------------------------------------------------------------------------------------------------\n";
+	}
+	out.close();
+}
+
+int main()
+{
+	setlocale(LC_ALL, "russian");
+
+	double deltaT = 0.01, // t-step
+		   deltaX = 0.1; // x-step (h)
+	int Nx = 1 / deltaX, // j - x
+		Nt = 1 / deltaT; // n - t
+
+    double **U = new double* [Nx+1]; // Array
+	for (int i = 0; i < Nx + 1; i++) {
+		U[i] = new double[Nt + 1];
+	}
+
+	//ExplicitScheme(deltaT, deltaX, Nx, Nt, U);
+	ImplicitScheme(deltaT, deltaX, Nx, Nt, U);
+	delete[] U;
 }
