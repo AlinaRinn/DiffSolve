@@ -4,22 +4,27 @@
 
 void ExplicitScheme(double deltaT, double deltaX, int Nx, int Nt, double **U)
 {
+	std::ofstream out("solve.txt");
+	std::cout << "\n\n\n\n\nЯвная схема\n\n";
+	out << "Явная схема\n\n";
 	if ((deltaT / deltaX) <= 0.5) 
 	{
 		std::cout << "Условная устойчивость\n\n";
+		out << "Условная устойчивость\n\n";
 	}
 	else 
 	{
 		std::cout << "Условие устойчивости не выполнено\n\n";
+		out << "Условие устойчивости не выполнено\n\n";
 	}
 
-	//for (int i = 0; i < Nx; i++)
-	//{
-	//	for (int k = 0; k < Nt; k++)
-	//	{
-	//		U[i][k] = 0;
-	//	}
-	//}
+	for (int i = 0; i <= Nx; i++)
+	{
+		for (int k = 0; k <= Nt; k++) // p. s. u(t=1,x)=0, then i just do this
+		{
+			U[i][k] = 0;
+		}
+	}
 
 	//int n = 1;
 
@@ -38,19 +43,18 @@ void ExplicitScheme(double deltaT, double deltaX, int Nx, int Nt, double **U)
 
 	while (n < Nt)
 	{
-		for (int j = 2; j < Nx - 1; j++)
+		for (int j = 2; j < Nx; j++)
 		{
 			U[j][n+1] = U[j][n] + (deltaT / pow(deltaX, 2)) * (U[j+1][n] - 2 * U[j][n] + U[j-1][n]) + pow(deltaT * ((j - 1) * deltaX), 2);
 		}
 		U[1][n+1] = pow(n * deltaT, 2);
-		U[Nx-1][n+1] = n * deltaT + pow(n * deltaT, 2);
+		U[Nx][n+1] = n * deltaT + pow(n * deltaT, 2);
 		n++;
 	}
 
-	std::ofstream out("solve.txt");
-	for (int i = 0; i < Nx; i++)
+	for (int i = 0; i <= Nx; i++)
 	{
-		for (int k = 0; k < Nt; k++)
+		for (int k = 0; k <= Nt; k++)
 		{
 			printf("%6.4lf ", U[i][k]);
 			out << U[i][k] << " ";
@@ -108,10 +112,11 @@ void ImplicitScheme(double deltaT, double deltaX, int Nx, int Nt, double **U) {
 	}
 
 	std::ofstream out("solve.txt", std::ios::app);
-	out << "\n\n\n\n\n";
-	for (int i = 0; i < Nx; i++)
+	std::cout << "\n\n\n\n\n\n\nНеявная схема\n\n\n";
+	out << "\n\n\nНеявная схема\n\n";
+	for (int i = 0; i <= Nx; i++)
 	{
-		for (int k = 0; k < Nt; k++)
+		for (int k = 0; k <= Nt; k++)
 		{
 			printf("%6.4lf ", U[i][k]);
 			out << U[i][k] << " ";
@@ -128,7 +133,7 @@ int main()
 {
 	setlocale(LC_ALL, "russian");
 
-	double deltaT = 0.01, // t-step
+	double deltaT = 0.0001, // t-step
 		   deltaX = 0.1; // x-step (h)
 	int Nx = 1 / deltaX, // j - x
 		Nt = 1 / deltaT; // n - t
@@ -138,7 +143,7 @@ int main()
 		U[i] = new double[Nt + 1];
 	}
 
-	//ExplicitScheme(deltaT, deltaX, Nx, Nt, U);
+	ExplicitScheme(deltaT, deltaX, Nx, Nt, U);
 	ImplicitScheme(deltaT, deltaX, Nx, Nt, U);
 	delete[] U;
 }
