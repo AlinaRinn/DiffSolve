@@ -1,25 +1,42 @@
 ﻿#include <iostream>
-#include <fstream>
-#include <iomanip>
+
+void PrintArray(double** U, FILE* cfout, int Nx, int Nt) {
+	fprintf(cfout, "	x1	x2	x3	x4	x5	x6	x7	x8	x9	x10	x11\n");
+	bool chk = 1;
+	for (int i = 0; i <= Nt; i++)
+	{
+		fprintf(cfout, "t%d	", i + 1);
+		for (int k = 0; k <= Nx; k++)
+		{
+			fprintf(cfout, "%.6lf	", U[k][i]);
+			if (k == Nx && chk != 0) {
+				fprintf(cfout, "ЛГУ");
+				chk = 0;
+			}
+		}
+		if (i == Nt) {
+			fprintf(cfout, "ПГУ\n");
+		}
+		fprintf(cfout, "\n");
+	}
+	fclose(cfout);
+}
 
 void ExplicitScheme(double deltaT, double deltaX, int Nx, int Nt, double **U)
 {
-	//std::ofstream out("solve.xls");
 	FILE* cfout;
 	cfout = fopen("solve.xls", "w");
 	//std::cout << "\n\n\n\n\nЯвная схема\n\n";
 	fprintf(cfout, "Явная схема\n\n");
-	//out << "Явная схема\n\n";
+
 	if ((deltaT / deltaX) <= 0.5) 
 	{
 		//std::cout << "Условная устойчивость\n\n";
-		//out << "Условная устойчивость\n\n";
 		fprintf(cfout, "Условная устойчивость\n\n");
 	}
 	else 
 	{
 		//std::cout << "Условие устойчивости не выполнено\n\n";
-		//out << "Условие устойчивости не выполнено\n\n";
 		fprintf(cfout, "Условие устойчивости не выполнено\n\n");
 	}
 
@@ -30,19 +47,6 @@ void ExplicitScheme(double deltaT, double deltaX, int Nx, int Nt, double **U)
 			U[i][k] = 0;
 		}
 	}
-
-	//int n = 1;
-
-	//while (n <= Nx)
-	//{
-	//	U[n][1] = pow(n * deltaT, 2);
-	//	U[n][Nt] = n * deltaT + pow(n * deltaT, 2);
-	//	for (int j = 2; j < Nt; j++)
-	//	{
-	//		U[n][j] = U[n-1][j] + (deltaT / pow(deltaX, 2)) * (U[n][j] - 2 * U[n][j-1] + U[n][j-2]) + pow(deltaT * ((j - 1) * deltaX), 2);
-	//	}
-	//	n++;
-	//}
 
 	int n = 0;
 
@@ -57,23 +61,7 @@ void ExplicitScheme(double deltaT, double deltaX, int Nx, int Nt, double **U)
 		n++;
 	}
 
-	for (int i = 0; i <= Nx; i++)
-	{
-		for (int k = 0; k <= Nt; k++)
-		{
-			//printf("%6.4lf ", U[i][k]);
-			fprintf(cfout, "%.6lf	", U[i][k]);
-			//out << sprintf("%6.4lf	", U[i][k]);
-			//out << U[i][k] << "	";
-			//std::cout.precision(5);
-			//std::cout << std::left << std::setw(10) << U[i][k] << " ";
-		}
-		fprintf(cfout, "\n");
-		//std::cout << "\n----------------------------------------------------------------------------------------------\n";
-		//out << "\n---------------------------------------------------------------------------------------------------------------------------------------------\n";
-	}
-	fclose(cfout);
-	//out.close();
+	PrintArray(U, cfout, Nx, Nt);
 }
 
 void ImplicitScheme(double deltaT, double deltaX, int Nx, int Nt, double **U) {
@@ -120,33 +108,17 @@ void ImplicitScheme(double deltaT, double deltaX, int Nx, int Nt, double **U) {
 		n++;
 	}
 
-	//std::ofstream out("solve.xls", std::ios::app);
 	FILE *cfout;
 	cfout = fopen("solve.xls", "a");
 	//std::cout << "\n\n\n\n\n\n\nНеявная схема\n\n\n";
 	fprintf(cfout, "\n\nНеявная схема\n\n");
-	for (int i = 0; i <= Nx; i++)
-	{
-		for (int k = 0; k <= Nt; k++)
-		{
-			//printf("%6.4lf ", U[i][k]);
-			fprintf(cfout, "%.6lf	", U[i][k]);
-			//out << U[i][k] << "	";
-			//out << printf("%6.4lf	", U[i][k]);
-			//std::cout.precision(5);
-			//std::cout << std::left << std::setw(10) << U[i][k] << " ";
-		}
-		fprintf(cfout, "\n");
-		//std::cout << "\n----------------------------------------------------------------------------------------------\n";
-		//out << "\n---------------------------------------------------------------------------------------------------------------------------------------------\n";
-	}
-	fclose(cfout);
+
+	PrintArray(U, cfout, Nx, Nt);
 }
 
 int main()
 {
 	setlocale(LC_ALL, "russian");
-	//setlocale(LC_NUMERIC, "ru_RU.UTF8");
 	double deltaT = 0.001, // t-step
 		   deltaX = 0.1; // x-step (h)
 	int Nx = 1 / deltaX, // j - x
