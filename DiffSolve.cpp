@@ -116,10 +116,37 @@ void ImplicitScheme(double deltaT, double deltaX, int Nx, int Nt, double **U) {
 	PrintArray(U, cfout, Nx, Nt);
 }
 
+void ImplicitScheme2(double deltaT, double deltaX, int Nx, int Nt, double** U) {
+	for (int n = 0; n < Nx; n++){
+		for (int j = 0; j < Nt; j++){
+			U[n][j] = 0;
+		}
+	}
+
+	for (int j = 1; j < Nx; j++) {
+		U[j][0] = pow(j - 1, 2) * pow(deltaX, 2);
+	}
+	int n = 0;
+	while (n <= Nt){
+		U[Nx][n+1] = pow(n + 1, 2) * pow(deltaT, 2) + 1;
+		for (int j = Nx-1; j > 1; j--)
+		{
+			U[j][n + 1] = (U[j][n] + (deltaT / deltaX) * U[j + 1][n + 1] + deltaT * (2 * (n * deltaT + (j - 1) * deltaX))) / (1 + deltaT / deltaX);
+		}
+		n++;
+	}
+
+	FILE* cfout;
+	cfout = fopen("solve.xls", "a");
+	fprintf(cfout, "\n\nНеявная схема\n\n");
+
+	PrintArray(U, cfout, Nx, Nt);
+}
+
 int main()
 {
 	setlocale(LC_ALL, "russian");
-	double deltaT = 0.001, // t-step
+	double deltaT = 0.01, // t-step
 		   deltaX = 0.1; // x-step (h)
 	int Nx = 1 / deltaX, // j - x
 		Nt = 1 / deltaT; // n - t
@@ -131,5 +158,6 @@ int main()
 
 	ExplicitScheme(deltaT, deltaX, Nx, Nt, U);
 	ImplicitScheme(deltaT, deltaX, Nx, Nt, U);
+	ImplicitScheme2(deltaT, deltaX, Nx, Nt, U);
 	delete[] U;
 }
