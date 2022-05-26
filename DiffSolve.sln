@@ -5,8 +5,6 @@ VisualStudioVersion = 17.0.32126.317
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DiffSolve", "DiffSolve.vcxproj", "{1B013083-DF71-464D-B59D-29688432044D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DiffSolve2", "..\DiffSolve2\DiffSolve2.vcxproj", "{124F3640-37AC-4DAC-9BCC-232E43DD8681}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -23,14 +21,6 @@ Global
 		{1B013083-DF71-464D-B59D-29688432044D}.Release|x64.Build.0 = Release|x64
 		{1B013083-DF71-464D-B59D-29688432044D}.Release|x86.ActiveCfg = Release|Win32
 		{1B013083-DF71-464D-B59D-29688432044D}.Release|x86.Build.0 = Release|Win32
-		{124F3640-37AC-4DAC-9BCC-232E43DD8681}.Debug|x64.ActiveCfg = Debug|x64
-		{124F3640-37AC-4DAC-9BCC-232E43DD8681}.Debug|x64.Build.0 = Debug|x64
-		{124F3640-37AC-4DAC-9BCC-232E43DD8681}.Debug|x86.ActiveCfg = Debug|Win32
-		{124F3640-37AC-4DAC-9BCC-232E43DD8681}.Debug|x86.Build.0 = Debug|Win32
-		{124F3640-37AC-4DAC-9BCC-232E43DD8681}.Release|x64.ActiveCfg = Release|x64
-		{124F3640-37AC-4DAC-9BCC-232E43DD8681}.Release|x64.Build.0 = Release|x64
-		{124F3640-37AC-4DAC-9BCC-232E43DD8681}.Release|x86.ActiveCfg = Release|Win32
-		{124F3640-37AC-4DAC-9BCC-232E43DD8681}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
