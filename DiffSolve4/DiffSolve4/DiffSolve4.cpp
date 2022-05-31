@@ -7,24 +7,29 @@ void SimpleIteration(double E, double h, int Nx, double** U) {
 	cfout = fopen("simpsolve.xls", "w");
 	fprintf(cfout, "\n\nПростая итерация\n\n");
 	fprintf(cfout, "	x1	x2	x3	x4	x5	x6	x7	x8	x9	x10	x11\n");
-	for (int j = 1; j < Nx; j++) {
-		U[j][0] = 4 * (j - 1) * h - 1;
-		std::cout << j << " " << U[j][0] << std::endl;
+	for (int j = 0; j < Nx; j++) {
+		U[0][j] = 4 * (j - 1) * h - 1;
+		std::cout << j << " " << U[0][j] << std::endl;
 	}
 	int n = 0;
-	for (int j = 2; j < Nx; j++)
+	double error = 0;
+	do
 	{
-		U[j][n + 1] = (U[j + 1][n] + (1 + h) * U[j - 1][n] + pow(h, 2) * (4 * (j - 1) * h - 1)) / (h + 2);
-		U[1][n + 1] = 0;
-		U[Nx][n + 1] = 5;
-		std::cout << j << " " << U[j][n] << std::endl;
-		if (abs(U[j][n + 1] - U[j][n]) <= E && n > (1 / pow(h, 2))) {
-			break;
+		for (int j = 1; j < Nx; j++)
+		{
+			U[n + 1][j] = (U[n][j + 1] + (1 + h) * U[n][j-1] + pow(h, 2) * (4 * (j - 1) * h - 1)) / (h + 2);
 		}
-		else {
-			n++;
-		}
-	}
+		U[n + 1][0] = 0;
+		U[n + 1][Nx-1] = 5;
+		n++;
+
+		error = 0;
+		for (int j = 1; j < Nx - 1; j++)
+			error += (U[n - 1][j] - U[n][j])* (U[n - 1][j] - U[n][j]);
+		error=sqrt(error * h);
+
+	} while (error >= E);
+
 
 	for (int i = 0; i < Nt; i++)
 	{
@@ -41,7 +46,7 @@ void SimpleIteration(double E, double h, int Nx, double** U) {
 
 int main()
 {
-	double E = 0.1;
+	double E = 0.01;
 	const double h = 0.1;
 	const int Nx = 1 / h;
 
