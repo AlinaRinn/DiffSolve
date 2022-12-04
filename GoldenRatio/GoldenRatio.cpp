@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <chrono>
+#include <vector>
 
 const double GOLDEN_NUMBER = 1.6180339887498948482045868343656381177203091798057628621354486227052604628189024497072072041893911374;
 const double E = 0.01,  // Error
@@ -43,6 +44,33 @@ double search(double A, double B, double GLDN_NMBR, int &iter) {
     return (A + B) / 2;
 }
 
+void printCSV(double** graph)
+{
+    FILE* f = fopen("graph.csv", "w");
+    if (f == NULL)
+    {
+        printf("Error opening file!\n");
+        exit(1);
+    }
+
+    fprintf(f, "x;f(x);\n\n");
+    for (int i = 0; i <= 1/E; i++)
+    {
+        fprintf(f, "%.5lf;%.10lf\n", graph[i][0], graph[i][1]);
+    }
+
+    fclose(f);
+}
+
+void graph_generator(double A, double B, double **graph, double increment = E){
+    double step = abs(B - A) * increment;
+    for (int i = 0; i <= 1/E; i++) {
+        graph[i][0] = A;
+        graph[i][1] = function(A);
+        A += step;
+    }
+}
+
 int main()
 {
     auto begin = std::chrono::high_resolution_clock::now();
@@ -50,6 +78,13 @@ int main()
     double minimum = search(A, B, GOLDEN_NUMBER, iter),
            func = function(minimum);
     auto end = std::chrono::high_resolution_clock::now();
+
+    double** graph = new double* [1/E]; 
+    for (int i = 0; i <= (1/E); i++) {
+        graph[i] = new double[2];
+    }
+    graph_generator(A, B, graph);
+    printCSV(graph);
 
     std::cout << "Minmum of given function is:      " << minimum
               << "\nFunction value in this point is: " << func;
@@ -59,6 +94,10 @@ int main()
     std::cout << "\nRuntime: " << (float)duration.count() << " sec"
               << "\nIteration count: " << iter << "\nError: " << E << "\n\n\n";
 
+
+    for (int count = 0; count < 2; count++) {
+        delete[] graph[count];
+    }
     system("pause");
 }
 
