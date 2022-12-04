@@ -1,6 +1,6 @@
 ﻿// Найти экстремум функции F(X) одним из четырех методов (методом золотого сечения, методом ломаных, методом касательных, методом Ньютона). 
 // Желательно запрограммировать на любом языке программирования или в Матлаб.
-// 22 2x^2-12x min [0; 2] 0.01
+// Дано: 22 2x^2-12x min [0; 2] 0.01 Метод золотого сечения
 
 #include <iostream>
 #include <chrono>
@@ -19,7 +19,7 @@ double search(double A, double B, double GLDN_NMBR, int &iter) {
     double x1 = 0, x2 = 0;
     double fx1 = 0, fx2 = 0;
 
-    // I dont make iteration constraint because i cant cause inf loop at any meaningful error value. Also dont want make program slower
+    // I dont make iteration constraint because i cant cause inf loop at any meaningful error value. Also dont want make program slower. Can add, if needed
     while (abs(B-A) > E) { 
         x1 = B - ((B - A) / GLDN_NMBR);
         x2 = A + ((B - A) / GLDN_NMBR);
